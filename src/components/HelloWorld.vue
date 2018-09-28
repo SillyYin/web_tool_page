@@ -1,102 +1,87 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li>
-        <a
-          href="https://vuejs.org"
-          target="_blank"
-        >
-          Core Docs
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://forum.vuejs.org"
-          target="_blank"
-        >
-          Forum
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://chat.vuejs.org"
-          target="_blank"
-        >
-          Community Chat
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://twitter.com/vuejs"
-          target="_blank"
-        >
-          Twitter
-        </a>
-      </li>
-      <br>
-      <li>
-        <a
-          href="http://vuejs-templates.github.io/webpack/"
-          target="_blank"
-        >
-          Docs for This Template
-        </a>
-      </li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li>
-        <a
-          href="http://router.vuejs.org/"
-          target="_blank"
-        >
-          vue-router
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vuex.vuejs.org/"
-          target="_blank"
-        >
-          vuex
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vue-loader.vuejs.org/"
-          target="_blank"
-        >
-          vue-loader
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-        >
-          awesome-vue
-        </a>
-      </li>
-    </ul>
+    <div id="main" style="width: 1200px;height:400px; margin-top: 25px"></div>
   </div>
 </template>
 
 <script>
+import $ from "jquery";
+import echarts from "echarts";
+
+let _data = [];
+let myChart = null;
+
 export default {
-  name: 'HelloWorld',
-  data () {
+  name: "HelloWorld",
+  data() {
     return {
-      msg: 'Welcome to Your Vue.js App'
-    }
+      data: [],
+    };
+  },
+
+  mounted (){
+    myChart = echarts.init(document.getElementById("main"));
+    const _this = this;
+    $.post(
+      "http://127.0.0.1:8000/initialize",
+      {},
+      function (res){
+        let resObj = JSON.parse(res);
+        console.log(resObj);
+        _this.data = resObj.data;
+        _data = resObj.data
+        let option = {
+          tooltip: {
+            trigger: "item"
+            //triggerOn: 'mousemove'
+          },
+          series: [
+            {
+              type: "tree",
+              data: [_data],
+              left: "5%",
+              right: "5%",
+              top: "8%",
+              bottom: "20%",
+              symbol: "emptyCircle",
+              orient: "vertical",
+              expandAndCollapse: true,
+              label: {
+                normal: {
+                  position: "top",
+                  rotate: 0,
+                  verticalAlign: "middle",
+                  align: "left",
+                  fontSize: 14
+                }
+              },
+              leaves: {
+                label: {
+                  normal: {
+                    position: "bottom",
+                    rotate: 0,
+                    verticalAlign: "middle",
+                    align: "center"
+                  }
+                }
+              },
+              animationDurationUpdate: 750
+            }
+          ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+      }
+    )
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
